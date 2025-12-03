@@ -98,6 +98,7 @@ function MazeGame() {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     setPath([{ x, y }]);
+    draw();
     if (!timerActive) {
       setTimerActive(true);
       startTimer();
@@ -112,6 +113,7 @@ function MazeGame() {
     if (walls.some((w) => x >= w.x && x <= w.x + w.w && y >= w.y && y <= w.y + w.h)) {
       setStatus("lost");
       setTimerActive(false);
+      setTimeout(() => restartLevel(), 1000);
       return;
     }
     if (Math.hypot(x - EXIT_POS.x, y - EXIT_POS.y) < CELL_SIZE / 2) {
@@ -120,6 +122,7 @@ function MazeGame() {
       return;
     }
     setPath((prev) => [...prev, { x, y }]);
+    draw();
   };
 
   const handlePointerUp = () => {
@@ -130,6 +133,11 @@ function MazeGame() {
     const interval = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
+          clearInterval(interval);
+          setStatus("lost");
+          setTimerActive(false);
+          restartLevel();
+          return 0;
           clearInterval(interval);
           setStatus("lost");
           setTimerActive(false);
